@@ -53,11 +53,13 @@ howto compress this directory as tar.gz
 howto show git log as oneline graph
 ```
 
-### Output modes
+### Options
 
 ```bash
-howto --print-cmd <query>    # print only the command (no UI)
-howto --print-json <query>   # print raw JSON from the LLM
+howto --engine <ENGINE> <query>  # LLM engine: auto (default), openai, ollama
+howto --print-cmd <query>        # print only the command (no UI)
+howto --print-json <query>       # print raw JSON from the LLM
+howto --force <query>            # allow high-risk and blocked commands
 ```
 
 ### Interactive mode (default)
@@ -69,14 +71,14 @@ Shows command, explanation, and risk level. You choose what to do:
   Explain: List all Docker containers (running and stopped)
   Risk:    low
 
-  [Enter] insert   [e] edit   [Esc/q] cancel
+  [Enter] insert   [e] edit   [Esc] cancel
 ```
 
 - **Enter** — accept the command
 - **e** — edit the command before accepting
-- **q** — cancel
+- **Esc** / **q** — cancel
 
-Medium-risk commands require typing `EXECUTE` to confirm. High-risk commands are blocked unless `--force` is used.
+Medium-risk commands require typing `EXECUTE` to confirm. High-risk commands are blocked unless `--force` is passed.
 
 ### Replace mode
 
@@ -107,6 +109,12 @@ To remove:
 howto uninstall
 ```
 
+To print the shell init script without modifying rc files (useful for `eval` in custom setups):
+
+```bash
+howto init zsh   # or bash
+```
+
 ## Environment variables
 
 | Variable | Default | Description |
@@ -116,7 +124,7 @@ howto uninstall
 | `HOWTO_MODEL` | engine default | Override model name |
 | `OPENAI_API_KEY` | — | OpenAI API key |
 | `OLLAMA_HOST` | `http://127.0.0.1:11434` | Ollama server URL |
-| `HOWTO_ALLOW_HIGH` | `0` | Set to `1` to allow high-risk commands with `--force` |
+| `HOWTO_ALLOW_HIGH` | `0` | Set to `1` to allow high-risk and blocked commands (same as `--force`) |
 
 ## Safety
 
@@ -125,7 +133,7 @@ howto classifies every generated command independently of the LLM:
 - **low** — read-only commands (ls, ps, grep, docker ps)
 - **medium** — state changes (service restart, package install) — requires `EXECUTE` confirmation
 - **high** — destructive commands (rm, prune, sudo) — blocked unless `--force`
-- **BLOCKED** — hard-blocked patterns (rm -rf /, mkfs, curl|sh, fork bombs) — refused unless `--force` + `HOWTO_ALLOW_HIGH=1`
+- **BLOCKED** — hard-blocked patterns (rm -rf /, mkfs, curl|sh, fork bombs) — blocked unless `--force`
 
 ## License
 
